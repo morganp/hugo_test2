@@ -1,0 +1,35 @@
+name: Publish to GH Pages
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Checkout destination
+        uses: actions/checkout@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          ref: gh-pages
+          path: built-site
+
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: '0.118.2'
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
